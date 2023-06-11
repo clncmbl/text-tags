@@ -30,8 +30,21 @@ function buildTextObjArrayArray(textlines) {
   return textlines.map(buildTextObjArrayFromLine)
 }
 
+function removeNullRowsAndCells(cellinfo) {
+  // First filter removes null rows;
+  // filter in map removes null cells.
+  return cellinfo.filter(r => r !== null)
+                 .map(r => r.filter(o => o !== null))
+}
+
+function setColSpans(cellinfo, colcount) {
+  cellinfo.forEach(r => r.forEach((o, idx, r) => {
+    o.colspan = (r[idx + 1]?.startcol ?? colcount) - o.startcol
+  }))
+}
+
 function buildCellInfoArrayArray(arrarrobj, colmrkridx) {
-  const cellinfo = new Array(arrarrobj.length).fill(null)
+  let cellinfo = new Array(arrarrobj.length).fill(null)
 
   // colstarts is an array containing the starting text column
   // of each column marker.
@@ -82,6 +95,13 @@ function buildCellInfoArrayArray(arrarrobj, colmrkridx) {
       } 
     }
   })
+
+  cellinfo = removeNullRowsAndCells(cellinfo)
+
+  setColSpans(cellinfo, colcount)
+  // TODO: Set colspan.
+  // TODO: Set rowspan.  Might need a special character to
+  //       indicate row spanning in other than first column.
   return cellinfo
 }
 
@@ -105,7 +125,8 @@ class TextTable extends HTMLElement {
 
     const cellinfo = buildCellInfoArrayArray(arrarrobj, colmrkridx)
 
-    console.log(JSON.stringify(cellinfo))
+    //console.log(JSON.stringify(cellinfo))
+    console.log(cellinfo)
 
     const shadow = this.attachShadow({mode: 'open'})
     shadow.innerHTML = `<div>new text</div>`
