@@ -1,20 +1,5 @@
 'use strict'
 
-
-function getColumnMarkerLineIndex(textlines) {
-  // The column marker line is the zero-based index of the first
-  // line in the textlines array containing only hyphens and
-  // whitespace.
-  let colmarkeridx = null
-  for (let i=0; i<textlines.length; i++) {
-    if (textlines[i].match(/^[-\s]*-[-\s]*$/)) {
-      colmarkeridx = i
-      break
-    }
-  }
-  return colmarkeridx
-}
-
 function buildTextObjArrayFromLine(textline) {
   const matcharr = Array.from(textline.matchAll(/\S+(?:\s\S+)*/g))
 
@@ -41,6 +26,30 @@ function setColSpans(cellinfo, colcount) {
   cellinfo.forEach(r => r.forEach((o, idx, r) => {
     o.colspan = (r[idx + 1]?.startcol ?? colcount) - o.startcol
   }))
+}
+
+
+function setRowSpans(cellinfo, colcount) {
+  // Assumes that spanned cells, after the first, contain only a single "
+  const spanCounts = new Array(colcount).fill(1)
+
+  // Work from the bottom up.
+  for (let i = cellinfo.length - 1; i >= 0; --i) {
+    //console.log(i)
+    const rowcells = cellinfo[i]
+
+    rowcells.forEach((c, ci) => {
+      if (c.str === '"') {
+        ++spanCounts[c.startcol]
+      } else {
+        if (spanCounts[c.startcol] !== 1) {
+          c.rowspan = spanCounts[c.startcol]
+          spanCounts[c.startcol] = 1
+        }
+      }
+    })
+    console.log(spanCounts)
+  }
 }
 
 function buildCellInfoArrayArray(arrarrobj, colmrkridx) {
@@ -99,9 +108,11 @@ function buildCellInfoArrayArray(arrarrobj, colmrkridx) {
   cellinfo = removeNullRowsAndCells(cellinfo)
 
   setColSpans(cellinfo, colcount)
-  // TODO: Set colspan.
+
   // TODO: Set rowspan.  Might need a special character to
   //       indicate row spanning in other than first column.
+  setRowSpans(cellinfo, colcount)
+
   return cellinfo
 }
 
@@ -116,24 +127,24 @@ class TextTable extends HTMLElement {
                         .filter(ln => !!ln) 
     console.log(lines)
 
-    const colmrkridx = getColumnMarkerLineIndex(lines)
-    console.log(colmrkridx)
+    const colmrkrtxtidx = lines.findIndex(line => /^[-\s]*-[-\s]*$/.test(line))
+    console.log(colmrkrtxtidx)
 
     // arrarrobj is an array of arrays of string-index objects.
     const arrarrobj = buildTextObjArrayArray(lines)
     console.log(arrarrobj)
 
-    const cellinfo = buildCellInfoArrayArray(arrarrobj, colmrkridx)
+    const cellinfo = buildCellInfoArrayArray(arrarrobj, colmrkrtxtidx)
+    const colmrkrrowidx = cellinfo.findIndex(r => r.every(c => /-+/.test(c.str)))
+    console.log(colmrkrrowidx)
 
     //console.log(JSON.stringify(cellinfo))
     console.log(cellinfo)
 
     const shadow = this.attachShadow({mode: 'open'})
     shadow.innerHTML = `<div>new text</div>`
-    
   }
 }
-
 
 if (!customElements.get('txt-table')) {
   customElements.define('txt-table', TextTable)
