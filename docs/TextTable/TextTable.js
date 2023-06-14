@@ -116,6 +116,52 @@ function buildCellInfoArrayArray(arrarrobj, colmrkridx) {
   return cellinfo
 }
 
+function buildTable(cellinfo, colmrkrrowidx) {
+  const tbl = document.createElement('table')
+  let thead = null
+  if (colmrkrrowidx > 0) {
+    thead = document.createElement('thead')
+    tbl.appendChild(thead)
+  }
+  const tbody = document.createElement('tbody')
+  tbl.appendChild(tbody)
+
+  
+  cellinfo.forEach((r, i) => {
+    if (i === colmrkrrowidx) {
+      return
+    }
+
+    const tr = document.createElement('tr')
+    let celltagname = 'td'
+  
+    if (i < colmrkrrowidx) {
+      thead.append(tr)
+      celltagname = 'th'
+    } else {
+      tbody.append(tr)
+    }
+
+    r.forEach(c => {
+      if (c.str === '"') {
+        return
+      }
+      const cellelem = document.createElement(celltagname)
+      if (c?.colspan > 1) {
+        cellelem.setAttribute('colspan', c.colspan)
+      }
+      if (c?.rowspan > 1) {
+        cellelem.setAttribute('rowspan', c.rowspan)
+      }
+
+      cellelem.append(c.str)
+      tr.append(cellelem)
+    })
+  })
+
+  return tbl
+}
+
 class TextTable extends HTMLElement {
   constructor() {
     super()
@@ -141,11 +187,16 @@ class TextTable extends HTMLElement {
     //console.log(JSON.stringify(cellinfo))
     console.log(cellinfo)
 
+    const tbl = buildTable(cellinfo, colmrkrrowidx)
+
     const shadow = this.attachShadow({mode: 'open'})
-    shadow.innerHTML = `<div>new text</div>`
+
+    shadow.appendChild(tbl)
   }
 }
 
 if (!customElements.get('txt-table')) {
   customElements.define('txt-table', TextTable)
 }
+
+
