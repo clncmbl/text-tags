@@ -116,14 +116,34 @@ function buildCellInfoArrayArray(arrarrobj, colmrkridx) {
   return cellinfo
 }
 
+function buildStyle() {
+  const style = document.createElement('style')
+  style.innerHTML = `
+    thead {
+      background-color: lightgrey;
+    }
+    td {
+      height: 60px;
+      border: 1px solid black;
+    }
+  
+  `
+
+  return style
+}
+
 function buildTable(cellinfo, colmrkrrowidx) {
   const tbl = document.createElement('table')
+  tbl.setAttribute('part', 'table')
+  
   let thead = null
   if (colmrkrrowidx > 0) {
     thead = document.createElement('thead')
+    thead.setAttribute('part', 'thead')
     tbl.appendChild(thead)
   }
   const tbody = document.createElement('tbody')
+  tbody.setAttribute('part', 'tbody')
   tbl.appendChild(tbody)
 
   
@@ -147,6 +167,7 @@ function buildTable(cellinfo, colmrkrrowidx) {
         return
       }
       const cellelem = document.createElement(celltagname)
+      cellelem.setAttribute('part', celltagname)
       if (c?.colspan > 1) {
         cellelem.setAttribute('colspan', c.colspan)
       }
@@ -187,10 +208,12 @@ class TextTable extends HTMLElement {
     //console.log(JSON.stringify(cellinfo))
     console.log(cellinfo)
 
+    const style = buildStyle()
     const tbl = buildTable(cellinfo, colmrkrrowidx)
 
     const shadow = this.attachShadow({mode: 'open'})
 
+    shadow.appendChild(style)
     shadow.appendChild(tbl)
   }
 }
