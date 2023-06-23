@@ -1,6 +1,11 @@
 'use strict'
 
-document.head.innerHTML += `
+// Intead of innerHTML trying document.currentScript together with
+// insertAdjacentHTML.
+
+document.currentScript.insertAdjacentHTML('afterend', `
+
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="stylesheet" href="main.css" blocking="render">
   <style>
@@ -11,4 +16,6 @@ document.head.innerHTML += `
     txt-table:not(:defined) {
       opacity: 0;
     }
-  <style>`
+  </style>
+
+  `)
