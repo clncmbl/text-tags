@@ -5,11 +5,21 @@
 // the desired script tag (for an importmap).
 // See https://github.com/WICG/import-maps#dynamic-import-map-example.
 
+const url = new URL(location.href)
+const cdn = url.searchParams.get('cdn')
+
+let importUrl = '/text-tags/'
+// Test use of CDN by adding a cdn=jsdelivr query parameter
+// to the URL for the current document.
+if (cdn === 'jsdelivr') {
+  importUrl = 'https://cdn.jsdelivr.net/gh/clncmbl/text-tags@main/docs/'
+}
+
 const im = document.createElement('script')
 im.type = 'importmap'
 im.textContent = JSON.stringify({
   "imports": {
-    "disableTextTable": "https://cdn.jsdelivr.net/gh/clncmbl/text-tags@main/docs/TextTable/TextTable.js",
+    "TextTable": importUrl + "TextTable/TextTable.js",
     "gh/": "https://cdn.jsdelivr.net/gh/clncmbl/text-tags@main/docs/",
     "dev/": "/text-tags/"
   }
