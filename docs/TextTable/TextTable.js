@@ -30,15 +30,23 @@ function setColSpans(cellinfo, colcount) {
 
 
 function setRowSpans(cellinfo, colcount) {
-  // Assumes that spanned cells, after the first, contain only a single "
+  // Assumes that spanned cells, after the first, contain only a
+  // single ".  The first column can use the explicit " to
+  // indicate row spanning, or can simply be left blank.
+
   const spanCounts = new Array(colcount).fill(1)
 
   // Work from the bottom up.
   for (let i = cellinfo.length - 1; i >= 0; --i) {
-    //console.log(i)
     const rowcells = cellinfo[i]
 
     rowcells.forEach((c, ci) => {
+      // If we have nothing for the first column then increase the
+      // rowspan counter for that column.
+      if (ci === 0 && c.startcol !== 0) {
+        ++spanCounts[0]
+      }
+
       if (c.str === '"') {
         ++spanCounts[c.startcol]
       } else {
@@ -48,7 +56,6 @@ function setRowSpans(cellinfo, colcount) {
         }
       }
     })
-    console.log(spanCounts)
   }
 }
 
@@ -188,25 +195,25 @@ class TextTable extends HTMLElement {
     super()
 
     const srctext = this.innerHTML
-    console.log(srctext)
     const lines = srctext.split(/\r\n|\r|\n/g)
                         .map(ln => ln.trimEnd())
                         .filter(ln => !!ln) 
-    console.log(lines)
-
+  
+    // This is the line index for the column markers.  Just dashes
+    // and spaces.
     const colmrkrtxtidx = lines.findIndex(line => /^[-\s]*-[-\s]*$/.test(line))
-    console.log(colmrkrtxtidx)
-
+  
     // arrarrobj is an array of arrays of string-index objects.
     const arrarrobj = buildTextObjArrayArray(lines)
-    console.log(arrarrobj)
-
+  
     const cellinfo = buildCellInfoArrayArray(arrarrobj, colmrkrtxtidx)
-    const colmrkrrowidx = cellinfo.findIndex(r => r.every(c => /-+/.test(c.str)))
-    console.log(colmrkrrowidx)
 
-    //console.log(JSON.stringify(cellinfo))
-    console.log(cellinfo)
+    // The column marker row index could be different from the
+    // column marker text line index because multiple text lines
+    // could be associated with a single row.
+    const colmrkrrowidx = cellinfo.findIndex(r => r.every(c => /-+/.test(c.str)))
+  
+    //console.log(cellinfo)
 
     const style = buildStyle()
     const tbl = buildTable(cellinfo, colmrkrrowidx)
