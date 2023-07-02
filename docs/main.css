@@ -1,3 +1,24 @@
-txt-table::part(td) {
+
+txt-table {
+  margin: 2em 0;
+}
+
+txt-table table {
+  border-collapse: collapse;
+}
+
+txt-table.table4 tr:nth-child(2n+1) {
+  font-family: sans-serif;
+}
+
+txt-table td {
   background-color: lightblue;
+  border: 1px solid grey;
+  text-align: center;
+  padding: .3em .5em;
+}
+
+txt-table th {
+  border: 1px solid grey;
+  padding: .5em;
 }
