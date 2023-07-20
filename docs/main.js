@@ -20,8 +20,7 @@ im.type = 'importmap'
 im.textContent = JSON.stringify({
   "imports": {
     "TextTable": importUrl + "TextTable/TextTable.js",
-    "gh/": "https://cdn.jsdelivr.net/gh/clncmbl/text-tags@main/docs/",
-    "dev/": "/text-tags/"
+    "TextFootnote": importUrl + "TextFootnote/TextFootnote.js",
   }
 })
 document.currentScript.after(im)
