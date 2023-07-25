@@ -11,10 +11,17 @@ function parseFootnotes(srctext) {
   const fndata = []
 
   for (let i = textlines.length - 1; i >= 0; --i) {
+    // TODO: Consider parameterizing the character for
+    // indicating a footnote (but default to '^').
     const start = textlines[i].startsWith('^')
     if (start) {
-      fndata.push(textlines.slice(i, sliceEndIndex)
-                           .join(' '))
+      const fullline = textlines.slice(i, sliceEndIndex)
+                                .join(' ')
+      const fnArr = fullline.match( /^(\S+)\s+(\S.*)$/ )
+
+      const footnoteObj = { tag: fnArr[1], txt: fnArr[2] }
+      console.log(footnoteObj)
+      fndata.push(fullline)
       sliceEndIndex = i
     }
 
@@ -22,6 +29,7 @@ function parseFootnotes(srctext) {
     console.log(start)
     console.log(sliceEndIndex)
   }
+
   console.log(fndata)
 }
 
