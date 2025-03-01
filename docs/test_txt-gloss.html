@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<meta charset='UTF-8'>
+
+<title>txt-gloss development</title>
+
+<style>
+  ruby > rt {
+    font-size: 70%;
+    border-top: 1px solid lightgrey;
+  }
+  ruby {
+    ruby-align: center;
+    ruby-position: under;
+    margin: 0 0.2em;
+    line-height: 1.8;
+  }
+</style>
+
+<script src='main.js'></script>
+<script type=module>import 'TextGloss' </script>
+
+<p>
+Below are some examples of the component text syntax followed by
+the desired ruby-rt glossed version in a div component with class="glossed".
+</p>
+
+<txt-gloss>
+Cynewulf benam    Siġebryht his rīċes.
+         deprived           of his kingdom
+</txt-gloss>
+
+<div class='glossed'>
+Cynewulf <ruby>benam<rt>deprived</rt></ruby> Siġebryht <ruby>his rīċes<rt>of his kingdom</rt></ruby>.
+</div>
+         
+<txt-gloss>
+Cynewulf benam Siġebryht his rīċes for unryhtum dǣdum.
+                                       unrighteous deeds
+</txt-gloss>
+
+<div class='glossed'>
+Cynewulf benam Siġebryht his rīċes for <ruby>unryhtum dǣdum<rt>unrighteous deeds</rt></ruby>.
+</div>
+
+<p>
+In the following case, we have multiple spaces separating both the main text and the gloss text, between "ond" and "Westseaxna", to indicate two distinct glosses.
+</p>
+
+<txt-gloss>
+Cynewulf ond  Westseaxna       wiotan
+         and  the West Saxons' counselors
+</txt-gloss>
+
+<div class='glossed'>
+Cynewulf <ruby>ond<rt>and</rt></ruby> <ruby>Westseaxna<rt>the West Saxon's</rt></ruby> <ruby>wiotan<rt>counselors</rt></ruby>
+</div>
+
+<p>
+In the following example, the "=" is used to indicate that the gloss extends across additional words in the main text.
+</p>
+
+<txt-gloss>
+Cynewulf benam Siġebryht his rīċes būton Hamtūnscīre.
+         xxxx  =         =         except Hampshire
+
+hē hæfde þā
+   had   it
+
+hē ofslōg þone aldormon
+   slew   the aldorman
+
+þe  him      lenġest wunode
+who with him longest remained
+</txt-gloss>
+
+<div class='glossed'>
+Cynewulf <ruby>benam Siġebryht his<rt>xxxx</rt></ruby> rīċes <ruby>būton Hamtūnscīre<rt>except Hampshire</rt></ruby>.
+
+hē <ruby>hæfde<rt>had</rt></ruby> <ruby>þā<rt>it</rt></ruby>
+
+hē <ruby>ofslōg<rt>slew</rt></ruby> <ruby>þone aldormon<rt>the aldorman</rt></ruby>
+
+<ruby>þe<rt>who</rt></ruby> <ruby>him<rt>with him</rt></ruby> <ruby>lenġest<rt>longest</rt></ruby> <ruby>wunode<rt>remained</rt></ruby>
+</div>
