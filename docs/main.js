@@ -19,6 +19,7 @@ const im = document.createElement('script')
 im.type = 'importmap'
 im.textContent = JSON.stringify({
   "imports": {
+    "TextGloss": importUrl + "TextGloss/TextGloss.js",
     "TextTable": importUrl + "TextTable/TextTable.js",
     "TextFootnote": importUrl + "TextFootnote/TextFootnote.js",
   }
