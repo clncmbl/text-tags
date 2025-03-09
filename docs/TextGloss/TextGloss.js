@@ -73,7 +73,7 @@ function chunkGroup(group) {
     let j = lastGlossWordIndex + 1;
     let k = lastTextWordIndex + 1;
 
-    // Inside the above repeat.  Still need the TODO.
+    // Inside the above repeat.
     while (true) {
       const jHasGloss = j < gline.length;
       const kHasText = k < tline.length;
@@ -180,6 +180,26 @@ class TextGloss extends HTMLElement {
   }
   
   connectedCallback() {
+    const shadow = this.attachShadow({ mode: 'open' });
+
+    const style = document.createElement('style');
+    style.textContent = `
+      rt {
+        font-size: 70%;
+        border-top: 1px solid lightgrey;
+      }
+      ruby {
+        ruby-align: center;
+        ruby-position: under;
+        margin: 0 0.2em;
+        line-height: 2.8;
+      }
+    `;
+    shadow.appendChild(style);
+
+    const wrapperdiv = document.createElement('div');
+    shadow.appendChild(wrapperdiv);
+
     const srctext = this.innerHTML
     console.log(srctext)
 
@@ -193,7 +213,7 @@ class TextGloss extends HTMLElement {
     const glossedlines = groups.map(glossForGroup)
 
     console.log(glossedlines);
-    this.innerHTML = glossedlines.join('<br/>');
+    wrapperdiv.innerHTML = glossedlines.join('<br/>');
   }
 }
 
