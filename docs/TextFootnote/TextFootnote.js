@@ -8,7 +8,7 @@ function parseFootnotes(srctext) {
                            .filter(ln => !!ln) 
 
   let sliceEndIndex = textlines.length
-  const fndata = []
+  let fndata = []
 
   for (let i = textlines.length - 1; i >= 0; --i) {
     // TODO: Consider parameterizing the character for
@@ -20,17 +20,17 @@ function parseFootnotes(srctext) {
       const fnArr = fullline.match( /^(\S+)\s+(\S.*)$/ )
 
       const footnoteObj = { tag: fnArr[1], txt: fnArr[2] }
-      console.log(footnoteObj)
-      fndata.push(fullline)
+      fndata.push(footnoteObj)
       sliceEndIndex = i
     }
 
-    console.log(i)
-    console.log(start)
     console.log(sliceEndIndex)
   }
 
-  console.log(fndata)
+  fndata = fndata.reverse()
+  fndata.forEach((o, i) => o.num = i+1)
+
+  return fndata
 }
 
 class TextFootnote extends HTMLElement {
@@ -41,6 +41,7 @@ class TextFootnote extends HTMLElement {
     console.log(srctext)
 
     const fndata = parseFootnotes(srctext) 
+    console.log(fndata)
   }
 
 }
