@@ -135,7 +135,7 @@ function chunkGroup(group) {
         //   add the next text word to the text (but then
         //   don't keep the '=' or other character used for this
         //   purpose.
-        if (j > 0 && i > 0
+        if (j > 0 && k > 0
             && gline[j].start === tline[k].start
             && ((gline[j-1].end === tline[k-1].end
                  && gline[j].start - gline[j-1].end === 1)
