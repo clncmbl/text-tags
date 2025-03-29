@@ -73,7 +73,6 @@ function chunkGroup(group) {
     let j = lastGlossWordIndex + 1;
     let k = lastTextWordIndex + 1;
 
-    // Inside the above repeat.
     while (true) {
       const jHasGloss = j < gline.length;
       const kHasText = k < tline.length;
@@ -166,7 +165,7 @@ function glossForGroup(group) {
 
   const glossedlines = chunks.map(c => {
     if (c.gloss) {
-      return '<ruby>'+c.text+'<rt>'+c.gloss+'</rt></ruby>';
+      return `<ruby>${c.text}<rt>${c.gloss}</rt></ruby>`;
     } else {
       return c.text;
     }
@@ -180,6 +179,8 @@ class TextGloss extends HTMLElement {
   }
   
   connectedCallback() {
+    const linejoin = this.getAttribute('linejoin') || '<br>';
+
     const shadow = this.attachShadow({ mode: 'open' });
 
     const style = document.createElement('style');
@@ -191,7 +192,7 @@ class TextGloss extends HTMLElement {
       ruby {
         ruby-align: center;
         ruby-position: under;
-        margin: 0 0.2em;
+        margin: 0 0.1em;
         line-height: 2.8;
       }
     `;
@@ -213,7 +214,7 @@ class TextGloss extends HTMLElement {
     const glossedlines = groups.map(glossForGroup)
 
     console.log(glossedlines);
-    wrapperdiv.innerHTML = glossedlines.join('<br/>');
+    wrapperdiv.innerHTML = glossedlines.join(linejoin);
   }
 }
 
