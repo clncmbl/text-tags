@@ -195,6 +195,16 @@ class TextGloss extends HTMLElement {
         margin: 0 0.1em;
         line-height: 2.8;
       }
+      .corner {
+        font-size: 0.7em;
+        vertical-align: 0.5em;
+      }
+      .corner.ul {
+        margin-right: -0.2em;
+      }
+      .corner.lr {
+        margin-left: -0.2em;
+      }
     `;
     shadow.appendChild(style);
 
@@ -214,7 +224,10 @@ class TextGloss extends HTMLElement {
     const glossedlines = groups.map(glossForGroup)
 
     console.log(glossedlines);
-    wrapperdiv.innerHTML = glossedlines.join(linejoin);
+    let html = glossedlines.join(linejoin);
+    html = html.replaceAll('\u231C', '<span class="corner ul">&ulcorner;</span>');
+    html = html.replaceAll('\u231D', '<span class="corner lr">&urcorner;</span>');
+    wrapperdiv.innerHTML = html;
   }
 }
 
