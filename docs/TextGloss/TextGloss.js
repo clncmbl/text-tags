@@ -173,18 +173,88 @@ function glossForGroup(group) {
   return glossedlines;
 }
 
+
+
 class TextGloss extends HTMLElement {
   constructor() {
     super()
   }
+
+
+  makeHtmlForGlossLines(lines) {
+    const linejoin = this.getAttribute('linejoin') || '<br>';
+
+    const groups = groupLines(lines);
+    console.log(groups);
+
+    if (groups.length === 0) {
+      return '';
+    }
+
+    const glossedlines = groups.map(glossForGroup);
+
+    console.log(glossedlines);
+    let html = glossedlines.join(linejoin);
+    html = `<div class="gloss">${html}</div>`
+    return html;
+  }
+
+  makeHtmlForNonGlossLines(lines) {
+    const html = `<div class="nogloss">${lines.join(' ')}</div>`;
+    return html;
+  }
+
+
+  makeHtmlForLines(lines) {
+
+    // TODO: Make a loop that repeatedly takes the next to-gloss section
+    // followed by the next footer section.  It creates HTML as we
+    // proceed.  Consider "---" to end to-gloss and start footer and
+    // "+++" to resume end footer and resume to-gloss.
+
+    let lcpy = [...lines]; // Just for development of loop.
+    const stopgloss = '---';
+    const startgloss = '+++';
+    let h = '';
+    while (lcpy.length > 0) {
+      let idx = lcpy.indexOf(stopgloss);
+      if (idx === -1) {
+        h += this.makeHtmlForGlossLines(lcpy);
+        break;
+      }
+
+      h += this.makeHtmlForGlossLines(lcpy.slice(0, idx));
+      lcpy = lcpy.slice(idx+1);
+
+      idx = lcpy.indexOf(startgloss);
+      if (idx === -1) {
+        h += this.makeHtmlForNonGlossLines(lcpy);
+        break;
+      }
+      h += this.makeHtmlForNonGlossLines(lcpy.slice(0, idx));
+      lcpy = lcpy.slice(idx+1);
+    }
+
+    let html = h;
+    //const html = this.makeHtmlForGlossLines(lines);
+    // Note that the following opens and closes a "notable" span class.
+    html = html.replaceAll('\u231C', '<span class="notable"><span class="corner ul">&ulcorner;</span>');
+    html = html.replaceAll('\u231D', '<span class="corner lr">&urcorner;</span></span>');
+    return html;
+  }
   
   connectedCallback() {
-    const linejoin = this.getAttribute('linejoin') || '<br>';
 
     const shadow = this.attachShadow({ mode: 'open' });
 
     const style = document.createElement('style');
     style.textContent = `
+      .nogloss {
+        font-size: 0.9em;
+      }
+      .nogloss .notable {
+        font-weight: bold;
+      }
       rt {
         font-size: 70%;
         border-top: 1px solid lightgrey;
@@ -209,6 +279,7 @@ class TextGloss extends HTMLElement {
     shadow.appendChild(style);
 
     const wrapperdiv = document.createElement('div');
+    wrapperdiv.classList.add('glosswrap');
     shadow.appendChild(wrapperdiv);
 
     const srctext = this.innerHTML
@@ -218,15 +289,9 @@ class TextGloss extends HTMLElement {
                          .map(ln => ln.trimEnd())
     console.log(lines)
 
-    const groups = groupLines(lines)
-    console.log(groups)
+    const html = this.makeHtmlForLines(lines);
 
-    const glossedlines = groups.map(glossForGroup)
 
-    console.log(glossedlines);
-    let html = glossedlines.join(linejoin);
-    html = html.replaceAll('\u231C', '<span class="corner ul">&ulcorner;</span>');
-    html = html.replaceAll('\u231D', '<span class="corner lr">&urcorner;</span>');
     wrapperdiv.innerHTML = html;
   }
 }
