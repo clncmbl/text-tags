@@ -180,6 +180,53 @@ class TextGloss extends HTMLElement {
     super()
   }
 
+  getCSS() {
+    const css = `
+      .nogloss {
+        font-size: 0.9em;
+        margin-left: 1.5em;
+        padding-left: 0.5em;
+        border-left: 1px solid #ddd;
+        color: #555;
+        background: #f8f8f8;
+      }
+      .nogloss p {
+        margin-top: 0.3em;
+        margin-bottom: 0.3em;
+      }
+      .nogloss .notable {
+        font-weight: bold;
+        line-height: 0.95; /* To adjust for bold. */
+        margin-right: 0.5em;
+      }
+      .textline {
+        display: block;
+        margin-top: 0.4em;
+        margin-bottom: 0.4em;
+      }
+      rt {
+        font-size: 70%;
+        border-top: 1px solid lightgrey;
+      }
+      ruby {
+        ruby-align: center;
+        ruby-position: under;
+        margin: 0 0.1em;
+      }
+      .corner {
+        font-size: 0.7em;
+        vertical-align: 0.5em;
+        line-height: 0;
+      }
+      .corner.ul {
+        margin-right: -0.2em;
+      }
+      .corner.lr {
+        margin-left: -0.2em;
+      }
+    `;
+    return css;
+  }
 
   makeHtmlForGlossLines(lines) {
 
@@ -252,45 +299,7 @@ class TextGloss extends HTMLElement {
     const shadow = this.attachShadow({ mode: 'open' });
 
     const style = document.createElement('style');
-    style.textContent = `
-      .nogloss {
-        font-size: 0.9em;
-      }
-      .nogloss p {
-        margin-top: 0.3em;
-        margin-bottom: 0.3em;
-      }
-      .nogloss .notable {
-        font-weight: bold;
-        line-height: 0.95; /* To adjust for bold. */
-        margin-right: 0.5em;
-      }
-      .textline {
-        display: block;
-        margin-top: 0.5em;
-        margin-bottom: 0.5em;
-      }
-      rt {
-        font-size: 70%;
-        border-top: 1px solid lightgrey;
-      }
-      ruby {
-        ruby-align: center;
-        ruby-position: under;
-        margin: 0 0.1em;
-      }
-      .corner {
-        font-size: 0.7em;
-        vertical-align: 0.5em;
-        line-height: 0;
-      }
-      .corner.ul {
-        margin-right: -0.2em;
-      }
-      .corner.lr {
-        margin-left: -0.2em;
-      }
-    `;
+    style.textContent = this.getCSS();
     shadow.appendChild(style);
 
     const wrapperdiv = document.createElement('div');
