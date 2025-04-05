@@ -182,7 +182,6 @@ class TextGloss extends HTMLElement {
 
 
   makeHtmlForGlossLines(lines) {
-    const linejoin = this.getAttribute('linejoin') || '<br>';
 
     const groups = groupLines(lines);
     console.log(groups);
@@ -191,15 +190,20 @@ class TextGloss extends HTMLElement {
       return '';
     }
 
-    const glossedlines = groups.map(glossForGroup);
+    let glossedlines = groups.map(glossForGroup);
 
     console.log(glossedlines);
-    let html = glossedlines.join(linejoin);
+
+    glossedlines = glossedlines.map(
+      ln => `<span class="textline">${ln}</span>`);
+
+    let html = glossedlines.join(' ');
     html = `<div class="gloss">${html}</div>`
     return html;
   }
 
   makeHtmlForNonGlossLines(lines) {
+    lines = lines.map(ln => `<p>${ln}</p>`);
     const html = `<div class="nogloss">${lines.join(' ')}</div>`;
     return html;
   }
@@ -252,8 +256,19 @@ class TextGloss extends HTMLElement {
       .nogloss {
         font-size: 0.9em;
       }
+      .nogloss p {
+        margin-top: 0.3em;
+        margin-bottom: 0.3em;
+      }
       .nogloss .notable {
         font-weight: bold;
+        line-height: 0.95; /* To adjust for bold. */
+        margin-right: 0.5em;
+      }
+      .textline {
+        display: block;
+        margin-top: 0.5em;
+        margin-bottom: 0.5em;
       }
       rt {
         font-size: 70%;
@@ -263,11 +278,11 @@ class TextGloss extends HTMLElement {
         ruby-align: center;
         ruby-position: under;
         margin: 0 0.1em;
-        line-height: 2.8;
       }
       .corner {
         font-size: 0.7em;
         vertical-align: 0.5em;
+        line-height: 0;
       }
       .corner.ul {
         margin-right: -0.2em;
