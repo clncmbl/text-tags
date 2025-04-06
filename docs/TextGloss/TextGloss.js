@@ -181,11 +181,13 @@ class TextGloss extends HTMLElement {
   }
 
   getCSS() {
+    const displayval = this.getAttribute('display') || 'block';
+
     const css = `
       .nogloss {
         font-size: 0.9em;
         margin-left: 1.5em;
-        padding-left: 0.5em;
+        padding: 0.1em 0.3em;
         border-left: 1px solid #ddd;
         color: #555;
         background: #f8f8f8;
@@ -194,13 +196,12 @@ class TextGloss extends HTMLElement {
         margin-top: 0.3em;
         margin-bottom: 0.3em;
       }
-      .nogloss .notable {
+      .footkey {
         font-weight: bold;
         line-height: 0.95; /* To adjust for bold. */
-        margin-right: 0.5em;
       }
       .textline {
-        display: block;
+        display: ${displayval};
         margin-top: 0.4em;
         margin-bottom: 0.4em;
       }
@@ -212,6 +213,7 @@ class TextGloss extends HTMLElement {
         ruby-align: center;
         ruby-position: under;
         margin: 0 0.1em;
+        text-wrap: nowrap;
       }
       .corner {
         font-size: 0.7em;
@@ -223,6 +225,9 @@ class TextGloss extends HTMLElement {
       }
       .corner.lr {
         margin-left: -0.2em;
+      }
+      .nogloss .lr {
+        margin-right: 0.5em;
       }
     `;
     return css;
@@ -242,7 +247,7 @@ class TextGloss extends HTMLElement {
     console.log(glossedlines);
 
     glossedlines = glossedlines.map(
-      ln => `<span class="textline">${ln}</span>`);
+      ln => `<span class="textline">${ln}</span><!--textline-->`);
 
     let html = glossedlines.join(' ');
     html = `<div class="gloss">${html}</div>`
@@ -250,7 +255,14 @@ class TextGloss extends HTMLElement {
   }
 
   makeHtmlForNonGlossLines(lines) {
-    lines = lines.map(ln => `<p>${ln}</p>`);
+    lines = lines.map(ln => {
+      ln = ln.replace(
+        /\u231C(.*?)\u231D/g,
+        "\u231C<span class='footkey'>$1</span>\u231D");
+      ln = `<p>${ln}</p>`;
+      return ln;
+     });
+
     const html = `<div class="nogloss">${lines.join(' ')}</div>`;
     return html;
   }
@@ -288,9 +300,8 @@ class TextGloss extends HTMLElement {
 
     let html = h;
     //const html = this.makeHtmlForGlossLines(lines);
-    // Note that the following opens and closes a "notable" span class.
-    html = html.replaceAll('\u231C', '<span class="notable"><span class="corner ul">&ulcorner;</span>');
-    html = html.replaceAll('\u231D', '<span class="corner lr">&urcorner;</span></span>');
+    html = html.replaceAll('\u231C', '<span class="corner ul">&ulcorner;</span><!--ul-->');
+    html = html.replaceAll('\u231D', '<span class="corner lr">&urcorner;</span><!--lr-->');
     return html;
   }
   
