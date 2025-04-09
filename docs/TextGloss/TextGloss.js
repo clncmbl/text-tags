@@ -177,13 +177,20 @@ function glossForGroup(group) {
 
 class TextGloss extends HTMLElement {
   constructor() {
-    super()
+    super();
   }
 
   getCSS() {
     const displayval = this.getAttribute('display') || 'block';
 
     const css = `
+      .gloss {
+        display: grid;
+        grid-template-columns: 5em max-content;
+      }
+      .linextra {
+        text-align: right;
+      }
       .nogloss {
         font-size: 0.9em;
         margin-left: 1.5em;
@@ -199,11 +206,6 @@ class TextGloss extends HTMLElement {
       .footkey {
         font-weight: bold;
         line-height: 0.95; /* To adjust for bold. */
-      }
-      .textline {
-        display: ${displayval};
-        margin-top: 0.4em;
-        margin-bottom: 0.4em;
       }
       rt {
         font-size: 70%;
@@ -246,8 +248,14 @@ class TextGloss extends HTMLElement {
 
     console.log(glossedlines);
 
-    glossedlines = glossedlines.map(
-      ln => `<span class="textline">${ln}</span><!--textline-->`);
+    glossedlines = glossedlines.map(ln => {
+      // Split on | but not if in part of ruby tagging.
+      const [txt, xtra=""] = ln.split(/\|(?!.*<\/ruby>)/)
+                             .map(p => p.trim());
+      return `
+        <span class="linextra">${xtra}</span>
+        <span class="linetext">${txt}</span>`;
+    });
 
     let html = glossedlines.join(' ');
     html = `<div class="gloss">${html}</div>`
