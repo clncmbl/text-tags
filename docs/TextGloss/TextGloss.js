@@ -68,7 +68,6 @@ function chunkGroup(group) {
     }
     lastTextWordIndex = i
     alignedChunks.push(textChunk)
-    //hasMoreText = (i + 1 < tline.length);
     
     let j = lastGlossWordIndex + 1;
     let k = lastTextWordIndex + 1;
@@ -186,7 +185,11 @@ class TextGloss extends HTMLElement {
     const css = `
       .gloss {
         display: grid;
-        grid-template-columns: 5em max-content;
+        grid-template-columns: 5ch max-content;
+        column-gap: 0.5em;
+        row-gap: 0.4em;
+        margin-bottom: .2em;
+        margin-top: .1em;
       }
       .linextra {
         text-align: right;
@@ -216,6 +219,9 @@ class TextGloss extends HTMLElement {
         ruby-position: under;
         margin: 0 0.1em;
         text-wrap: nowrap;
+      }
+      ruby:first-child {
+        ruby-align: start;
       }
       .corner {
         font-size: 0.7em;
