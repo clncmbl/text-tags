@@ -94,7 +94,9 @@ function chunkGroup(group) {
       // If the next text word starts before or on
       // the character (likely, a space) immediately
       // following the gloss, add that text to the
-      // textChunk.
+      // textChunk.  (In this case, we are adding
+      // text to a textChunk that has some gloss
+      // already.)
       if (kHasText && j > 0
           && tline[k].start <= gline[j-1].end) {
 
@@ -104,6 +106,24 @@ function chunkGroup(group) {
         continue;
       }
 
+      // If textChunk has no gloss and we have new text and
+      // either we no more gloss
+      // or the we have gloss but it comes after the end of the
+      // next text word, then add the next text word to the
+      // text chunk.
+      if (!textChunk.gloss && kHasText && (!jHasGloss
+          || gline[j].start > tline[k].end)) {
+
+        textChunk.text += (' ' + tline[k].word);
+        lastTextWordIndex = k;
+        k++;
+        continue;
+      }
+
+      // If the textChunk has gloss, but there is no more
+      // gloss, time to break.  (Then, we either start the
+      // last textChunk with no gloss or we are done making
+      // chunks.)
       if (!jHasGloss) {
         break;
       }
@@ -157,19 +177,33 @@ function chunkGroup(group) {
 }
 
 function glossForGroup(group) {
-  if (group.length === 1) return group[0];
+  // If we have no gloss for then span as for one chunk.
+  if (group.length === 1) {
+    if (group[0].includes('|')) {
+      return group[0].replace(/(.*)\|(.*)$/,
+                             '<span>$1</span>|$2');
+    } else {
+      return `<span>${group[0]}</span>`;
+    }
+  }
 
   const chunks = chunkGroup(group);
   console.log(chunks);
 
-  const glossedlines = chunks.map(c => {
+  const glossedline = chunks.map((c, idx, arr) => {
     if (c.gloss) {
       return `<ruby>${c.text}<rt>${c.gloss}</rt></ruby>`;
+    } else if (idx === arr.length - 1 && c.text.includes('|')) {
+        return c.text.replace(/(.*)\|(.*)$/,
+                              (m, befBar, aftBar) => {
+            return befBar ? `<span>${befBar}</span>|${aftBar}`
+                      : `|${aftBar}`;
+          });
     } else {
-      return c.text;
+      return `<span>${c.text}</span>`;
     }
   }).join(' ');
-  return glossedlines;
+  return glossedline;
 }
 
 
@@ -255,7 +289,9 @@ class TextGloss extends HTMLElement {
     console.log(glossedlines);
 
     glossedlines = glossedlines.map(ln => {
-      // Split on | but not if in part of ruby tagging.
+      // Split on '|' but not if in part of ruby tagging.
+      // Might want to make that a configurable special
+      // character.
       const [txt, xtra=""] = ln.split(/\|(?!.*<\/ruby>)/)
                              .map(p => p.trim());
       return `
