@@ -177,7 +177,7 @@ function chunkGroup(group) {
 }
 
 function glossForGroup(group) {
-  // If we have no gloss for then span as for one chunk.
+  // If we have no gloss then span as for one chunk.
   if (group.length === 1) {
     if (group[0].includes('|')) {
       return group[0].replace(/(.*)\|(.*)$/,
@@ -217,6 +217,10 @@ class TextGloss extends HTMLElement {
     const displayval = this.getAttribute('display') || 'block';
 
     const css = `
+      .glosswrap {
+        display: grid;
+        grid-template-columns: auto auto;
+      }
       .gloss {
         display: grid;
         grid-template-columns: 5ch max-content;
@@ -233,10 +237,14 @@ class TextGloss extends HTMLElement {
         margin-left: 1.5em;
         padding: 0.1em 0.3em;
         border-left: 1px solid #ddd;
-        color: #555;
         background: #f8f8f8;
+        /* ---- */
+        display: flex;
+        flex-direction: column;
+        margin-top: auto;
+        padding: .5em;
       }
-      .nogloss p {
+      .nogloss .topic {
         margin-top: 0.3em;
         margin-bottom: 0.3em;
       }
@@ -309,11 +317,15 @@ class TextGloss extends HTMLElement {
       ln = ln.replace(
         /\u231C(.*?)\u231D/g,
         "\u231C<span class='footkey'>$1</span>\u231D");
-      ln = `<p>${ln}</p>`;
+      if (ln === '----') {
+        ln = "</div><div class='topic'>";
+      }
       return ln;
      });
 
-    const html = `<div class="nogloss">${lines.join(' ')}</div>`;
+    const html = `<div class="nogloss">
+                    <div class="topic">${lines.join(' ')}</div>
+                  </div>`;
     return html;
   }
 
