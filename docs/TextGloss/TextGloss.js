@@ -236,8 +236,7 @@ class TextGloss extends HTMLElement {
         font-size: 0.9em;
         margin-left: 1.5em;
         padding: 0.1em 0.3em;
-        border-left: 1px solid #ddd;
-        background: #f8f8f8;
+        border-left: 1px solid currentColor;
         /* ---- */
         display: flex;
         flex-direction: column;
@@ -254,7 +253,7 @@ class TextGloss extends HTMLElement {
       }
       rt {
         font-size: 70%;
-        border-top: 1px solid lightgrey;
+        border-top: 1px dotted currentColor;
       }
       ruby {
         ruby-align: center;
