@@ -4,7 +4,7 @@ function groupLines(lines) {
   // This should take 
   // ["a", "b", "", "", "c", "", "d", "e", "f", "", "", "", "g"]
   // and return
-  // [["a", "b"], ["c"], ["d", "e"], ["f"], ["g"]]
+  // [["a", "b"], ["c",""], ["d", "e"], ["f",""], ["g",""]]
   
   let groups = []
   let i = 0
@@ -16,9 +16,9 @@ function groupLines(lines) {
     if (i >= lines.length) {
       break;
     }
-    let group = [lines[i]]
-    if (i+1 < lines.length && lines[i+1] !== '') {
-      group.push(lines[i+1])
+    let group = [lines[i], '']
+    if ((i+1 < lines.length) && (lines[i+1] !== '')) {
+      group[1] = lines[i+1]
       i+=2
     } else {
       i++
@@ -177,20 +177,12 @@ function chunkGroup(group) {
 }
 
 function glossForGroup(group) {
-  // If we have no gloss then span as for one chunk.
-  if (group.length === 1) {
-    if (group[0].includes('|')) {
-      return group[0].replace(/(.*)\|(.*)$/,
-                             '<span>$1</span>|$2');
-    } else {
-      return `<span>${group[0]}</span>`;
-    }
-  }
 
   const chunks = chunkGroup(group);
   console.log(chunks);
 
   const glossedline = chunks.map((c, idx, arr) => {
+
     if (c.gloss) {
       return `<ruby>${c.text}<rt>${c.gloss}</rt></ruby>`;
     } else if (idx === arr.length - 1 && c.text.includes('|')) {
@@ -301,6 +293,7 @@ class TextGloss extends HTMLElement {
       // character.
       const [txt, xtra=""] = ln.split(/\|(?!.*<\/ruby>)/)
                              .map(p => p.trim());
+
       return `
         <span class="linextra">${xtra}</span>
         <span class="linetext">${txt}</span>`;
