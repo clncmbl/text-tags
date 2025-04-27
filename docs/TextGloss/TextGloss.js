@@ -182,22 +182,15 @@ function glossForGroup(group) {
   console.log(chunks);
 
   const glossedline = chunks.map((c, idx, arr) => {
-
     if (c.gloss) {
-      return `<ruby>${c.text}<rt>${c.gloss}</rt></ruby>`;
-    } else if (idx === arr.length - 1 && c.text.includes('|')) {
-        return c.text.replace(/(.*)\|(.*)$/,
-                              (m, befBar, aftBar) => {
-            return befBar ? `<span>${befBar}</span>|${aftBar}`
-                      : `|${aftBar}`;
-          });
+      const rbcls = idx === 0 ? 'class=leftmost' : '';
+      return `<ruby ${rbcls}>${c.text}<rt>${c.gloss}</rt></ruby>`;
     } else {
-      return `<span>${c.text}</span>`;
+      return c.text;
     }
   }).join(' ');
   return glossedline;
 }
-
 
 
 class TextGloss extends HTMLElement {
@@ -223,6 +216,10 @@ class TextGloss extends HTMLElement {
       }
       .linextra {
         text-align: right;
+      }
+      .linetext {
+        display: flex;
+        gap: .5ch;
       }
       .nogloss {
         font-size: 0.9em;
@@ -250,10 +247,9 @@ class TextGloss extends HTMLElement {
       ruby {
         ruby-align: center;
         ruby-position: under;
-        margin: 0 0.1em;
         text-wrap: nowrap;
       }
-      ruby:first-child {
+      ruby.leftmost {
         ruby-align: start;
       }
       .corner {
@@ -288,6 +284,15 @@ class TextGloss extends HTMLElement {
     console.log(glossedlines);
 
     glossedlines = glossedlines.map(ln => {
+
+      // Replace underscores with &nbsp;
+      ln = ln.replaceAll(/(^|\s)(_+)(\s)/g,
+                         (m, pre, uscores, post) => {
+             // Using m.length to include captured spaces.
+             const repl = '&ensp;'.repeat(m.length);
+             return `<span class=space>${repl}</span>`;
+           });
+
       // Split on '|' but not if in part of ruby tagging.
       // Might want to make that a configurable special
       // character.
