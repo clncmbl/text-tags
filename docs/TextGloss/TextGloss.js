@@ -363,8 +363,26 @@ class TextGloss extends HTMLElement {
     html = html.replaceAll('\u231D', '<span class="corner lr">&urcorner;</span><!--lr-->');
     return html;
   }
+
+  async getSourceText() {
+    const txtFileAttr = this.getAttribute('txtfile');
+    if (txtFileAttr) {
+      try {
+        const response = await fetch(txtFileAttr);
+        if (!response.ok) {
+          console.error(`Error fetching "${txtFileAttr}": ${response.status}`);
+          return '';
+        }
+        return await response.text();
+      } catch (err) {
+        console.error(`Could not load "${txtFileAttr}":`, err);
+        return '';
+      }
+    }
+    return this.innerHTML;
+  }
   
-  connectedCallback() {
+  async connectedCallback() {
 
     const shadow = this.attachShadow({ mode: 'open' });
 
@@ -376,7 +394,7 @@ class TextGloss extends HTMLElement {
     wrapperdiv.classList.add('glosswrap');
     shadow.appendChild(wrapperdiv);
 
-    const srctext = this.innerHTML
+    const srctext = await this.getSourceText();
     console.log(srctext)
 
     const lines = srctext.split(/\r\n|\r|\n/g)
