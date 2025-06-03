@@ -194,6 +194,10 @@ function glossForGroup(group) {
 
 
 class TextGloss extends HTMLElement {
+
+  startnongloss = '---';
+  startgloss = '+++';
+
   constructor() {
     super();
   }
@@ -314,12 +318,14 @@ class TextGloss extends HTMLElement {
       ln = ln.replace(
         /\u231C(.*?)\u231D/g,
         "\u231C<span class='footkey'>$1</span>\u231D");
-      if (ln === '----') {
+      if (ln === this.startnongloss) {
+        // Close current nongloss div and start a new one.
         ln = "</div><div class='topic'>";
       }
       return ln;
      });
 
+    // Net effect is one or more topic divs in a nogloss div.
     const html = `<div class="nogloss">
                     <div class="topic">${lines.join(' ')}</div>
                   </div>`;
@@ -333,13 +339,14 @@ class TextGloss extends HTMLElement {
     // followed by the next footer section.  Create HTML as we
     // proceed.  Consider "---" to end to-gloss and start footer and
     // "+++" to resume end footer and resume to-gloss.
+    // I have gone back and forth on whether to use the same
+    // string for starting a new topic within a nongloss
+    // block.  Need to consider.
 
     let lcpy = [...lines]; // Just for development of loop.
-    const stopgloss = '---';
-    const startgloss = '+++';
     let h = '';
     while (lcpy.length > 0) {
-      let idx = lcpy.indexOf(stopgloss);
+      let idx = lcpy.indexOf(this.startnongloss);
       if (idx === -1) {
         h += this.makeHtmlForGlossLines(lcpy);
         break;
@@ -348,7 +355,7 @@ class TextGloss extends HTMLElement {
       h += this.makeHtmlForGlossLines(lcpy.slice(0, idx));
       lcpy = lcpy.slice(idx+1);
 
-      idx = lcpy.indexOf(startgloss);
+      idx = lcpy.indexOf(this.startgloss);
       if (idx === -1) {
         h += this.makeHtmlForNonGlossLines(lcpy);
         break;
